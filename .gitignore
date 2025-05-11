@@ -34,3 +34,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ignore firebase functions build files
+/functions/node_modules
+/functions/lib
+/functions/.webpack
