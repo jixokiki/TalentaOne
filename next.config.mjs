@@ -1,4 +1,18 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {};
+// // next.config.js
+// /** @type {import('next').NextConfig} */
+// const nextConfig = {
+//     // reactStrictMode: true,
+//     output: 'export' 
+//   };
+  
+//   export default nextConfig;
+  
 
-export default nextConfig;
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    reactStrictMode: true,
+    // Hapus output: 'export'
+  };
+  
+  export default nextConfig;
+  
