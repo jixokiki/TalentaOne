@@ -237,7 +237,7 @@
 
 import { useState, useEffect } from 'react';
 import { collection, getDocs, query, orderBy, onSnapshot, addDoc, where } from 'firebase/firestore';
-import { db } from '@/lib/firebaseConfig';
+import { auth, db } from '@/lib/firebaseConfig';
 import NavbarAdmin from '@/app/navbaradmin'; // Sesuaikan path sesuai struktur proyek Anda
 import { Message } from "@/lib/types";
 import React from "react";
@@ -496,7 +496,18 @@ const handleSendMessage = async (e: React.FormEvent) => {
   };
 
   // Simpan pesan ke Firestore
-  await addDoc(collection(db, "chats"), messageData);
+  // await addDoc(collection(db, "chats"), messageData);
+
+  if (!newMessage) return;
+    if (!newMessage) return;
+    await addDoc(collection(db, 'chats'), {
+      text: newMessage,
+      sender: 'Admin',
+      queueNumber: activeQueueNumber,
+      // createdAt: new Date(),
+      timestamp: new Date(),
+    });
+  
 
   // Tambahkan pesan ke state lokal agar langsung muncul di UI
   setMessages((prevMessages) => [...prevMessages, messageData]);
@@ -504,6 +515,79 @@ const handleSendMessage = async (e: React.FormEvent) => {
   // Reset input
   setNewMessage("");
 };
+
+
+// const handleSendMessageRekomendasi = async () => {
+//   if (!selectedWorker) {
+//     console.error("Tidak ada worker yang dipilih.");
+//     return;
+//   }
+
+//   const user = auth.currentUser;
+
+//   const rekomendasiData = {
+//     user: user,
+//     sender: "Admin",
+//     text: `Rekomendasi Worker: ${selectedWorker.role}`,
+//     senderRekomendasi: selectedWorker.role,
+//     profilePictureUrl: selectedWorker.profilePictureUrl,
+//     queueNumber: activeQueueNumber || "",
+//     createdAt: new Date(),
+//     recipient: selectedUser ? selectedUser.uid : null,
+//   };
+
+//   try {
+//     await addDoc(collection(db, "chats"), {
+//       ...rekomendasiData,
+//       timestamp: new Date(),
+//     });
+
+//     // Tambahkan ke UI lokal
+//     setMessages((prev) => [...prev, rekomendasiData]);
+
+//     // Optional: Notifikasi atau feedback
+//     alert("Rekomendasi berhasil dikirim.");
+//   } catch (error) {
+//     console.error("Gagal mengirim rekomendasi:", error);
+//     alert("Terjadi kesalahan saat mengirim rekomendasi.");
+//   }
+// };
+
+const handleSendMessageRekomendasi = async () => {
+  if (!selectedWorker) {
+    console.error("Tidak ada worker yang dipilih.");
+    return;
+  }
+
+  const rekomendasiData = {
+    sender: "Admin",
+    text: `Rekomendasi Worker: ${selectedWorker.role}`,
+    type: "rekomendasi", // 💡 penanda khusus
+    senderRekomendasi: selectedWorker.role,
+    profilePictureUrl: selectedWorker.profilePictureUrl,
+    specialRole: selectedWorker.specialRole,
+    portofolioUrl: selectedWorker.portofolioUrl,
+    description: selectedWorker.description || "",
+    queueNumber: activeQueueNumber || "",
+    createdAt: new Date(),
+    recipient: selectedUser ? selectedUser.uid : null,
+  };
+
+  try {
+    await addDoc(collection(db, "chats"), {
+      ...rekomendasiData,
+      timestamp: new Date(),
+    });
+
+    setMessages((prev) => [...prev, rekomendasiData]);
+    alert("Rekomendasi berhasil dikirim.");
+  } catch (error) {
+    console.error("Gagal mengirim rekomendasi:", error);
+    alert("Terjadi kesalahan saat mengirim rekomendasi.");
+  }
+};
+
+
 
 // **Ambil Chat Secara Real-Time**
 useEffect(() => {
@@ -840,24 +924,30 @@ setMessages(fetchedMessages);
       )}
 
       {selectedWorker && (
-        <div className="mt-4 p-3 bg-gray-100 rounded-lg">
-          <p className="text-sm font-semibold text-gray-800">Worker yang Dipilih:</p>
-          <div className="flex items-center space-x-2 mt-2">
-            <img
-              src={selectedWorker.profilePictureUrl}
-              alt="Profile"
-              className="w-8 h-8 rounded-full object-cover border-2 border-gray-300"
-            />
-            <p className="text-sm text-gray-700">{selectedWorker.role}</p>
-          </div>
-          <button type="submit" onSubmit={handleSendMessage} className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-700 transition duration-300">
-            Send
-          </button>
-        </div>
-      )}
+  <div className="mt-4 bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow duration-300 p-3 bg-gray-100 rounded-lg">
+    <p className="text-sm font-semibold text-gray-800">Worker yang Dipilih:</p>
+    <div className="flex max-h-32 overflow-y-auto items-center space-x-2 mt-2">
+      <img
+        src={selectedWorker.profilePictureUrl}
+        alt="Profile"
+        className="w-8 h-8 rounded-full object-cover border-2 border-gray-300"
+      />
+      <p className="text-sm text-gray-700">{selectedWorker.role}</p>
+    </div>
+    <button
+      type="submit"
+      onClick={handleSendMessageRekomendasi}
+      className="mt-3 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-700 transition duration-300"
+    >
+      Send
+    </button>
+  </div>
+)}
+
       </div>
     )}
 
     </div>
   );
 }
+

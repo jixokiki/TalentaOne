@@ -1,5 +1,6 @@
 // src/lib/types.ts
 export interface Task {
+  [x: string]: string | number | Date;
   id: string;
   taskId: string;
   name: string;
@@ -27,8 +28,16 @@ export interface Service {
     sender: string;
     createdAt: Date;
     queueNumber: string;
+    senderName?: string;
+    // timestamp: any; // bisa gunakan Timestamp dari Firebase jika ingin lebih spesifik
   }
-  
+//   type Message = {
+//   text: string;
+//   sender: string;
+//   senderName?: string;
+//   timestamp: any; // bisa gunakan Timestamp dari Firebase jika ingin lebih spesifik
+// };
+
   export interface UserData {
     uid: string;
     name: string;
@@ -37,6 +46,7 @@ export interface Service {
   }
   
   export interface WorkerProfile {
+    [x: string]: any;
     noRekening: string;
     role: string;
     specialRole: string;
