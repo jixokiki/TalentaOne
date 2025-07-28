@@ -212,7 +212,7 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
-  query,
+  // query,
   // where
 } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebaseConfig';
@@ -375,50 +375,75 @@ export default function Services() {
 //   return () => unsubscribe();
 // }, []);
 
+//JANGAN DIHAPUS KI
+// useEffect(() => {
+//   const unsubscribe = auth.onAuthStateChanged((user) => {
+//     if (!user) {
+//       console.log("Belum login. Tidak bisa ambil jawabanWorker.");
+//       return;
+//     }
+
+//     console.log("User login dengan email:", user.email);
+
+//     // Ambil semua data di jawabanWorker tanpa filter userEmail
+//     const q = query(collection(db, "tugasdariuser"));
+
+//     const unsubSnapshot = onSnapshot(q, async (snapshot) => {
+//       console.log("Jumlah dokumen ditemukan di tugasdariuser:", snapshot.size);
+
+//       if (snapshot.empty) {
+//         console.log("Tidak ada data di tugasdariuser.");
+//         return;
+//       }
+
+//       const taskPromises = snapshot.docs.map(async (docSnap) => {
+//         const data = docSnap.data();
+//         const taskId = data.taskId;
+
+//         console.log("Data tugasdariuser ditemukan:", data);
+
+//         const tugasRef = doc(db, "tugasdariuser", taskId);
+//         const tugasSnap = await getDoc(tugasRef);
+
+//         if (tugasSnap.exists()) {
+//           console.log("Data tugas dari user ditemukan:", tugasSnap.data());
+//           return {
+//             id: tugasSnap.id,
+//             ...tugasSnap.data(),
+//           } as Task;
+//         } else {
+//           console.warn(`Tugas dengan ID ${taskId} tidak ditemukan di tugasdariuser.`);
+//           return null;
+//         }
+//       });
+
+//       const resolvedTasks = (await Promise.all(taskPromises)).filter(Boolean) as Task[];
+//       setNotifications(resolvedTasks);
+//     });
+
+//     return () => unsubSnapshot();
+//   });
+
+//   return () => unsubscribe();
+// }, []);
 
 useEffect(() => {
   const unsubscribe = auth.onAuthStateChanged((user) => {
     if (!user) {
-      console.log("Belum login. Tidak bisa ambil jawabanWorker.");
+      console.log("Belum login. Tidak bisa ambil tugas.");
       return;
     }
 
     console.log("User login dengan email:", user.email);
 
-    // Ambil semua data di jawabanWorker tanpa filter userEmail
-    const q = query(collection(db, "tugasdariuser"));
+    const unsubSnapshot = onSnapshot(collection(db, "tugasdariuser"), (snapshot) => {
+      const tasks: Task[] = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      })) as Task[];
 
-    const unsubSnapshot = onSnapshot(q, async (snapshot) => {
-      console.log("Jumlah dokumen ditemukan di tugasdariuser:", snapshot.size);
-
-      if (snapshot.empty) {
-        console.log("Tidak ada data di tugasdariuser.");
-        return;
-      }
-
-      const taskPromises = snapshot.docs.map(async (docSnap) => {
-        const data = docSnap.data();
-        const taskId = data.taskId;
-
-        console.log("Data tugasdariuser ditemukan:", data);
-
-        const tugasRef = doc(db, "tugasdariuser", taskId);
-        const tugasSnap = await getDoc(tugasRef);
-
-        if (tugasSnap.exists()) {
-          console.log("Data tugas dari user ditemukan:", tugasSnap.data());
-          return {
-            id: tugasSnap.id,
-            ...tugasSnap.data(),
-          } as Task;
-        } else {
-          console.warn(`Tugas dengan ID ${taskId} tidak ditemukan di tugasdariuser.`);
-          return null;
-        }
-      });
-
-      const resolvedTasks = (await Promise.all(taskPromises)).filter(Boolean) as Task[];
-      setNotifications(resolvedTasks);
+      console.log("📦 Tugas ditemukan:", tasks);
+      setNotifications(tasks);
     });
 
     return () => unsubSnapshot();
@@ -426,6 +451,7 @@ useEffect(() => {
 
   return () => unsubscribe();
 }, []);
+
 
 
   // useEffect(() => {

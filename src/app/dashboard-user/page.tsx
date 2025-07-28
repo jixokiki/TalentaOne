@@ -777,6 +777,8 @@ export default function UserDashboard() {
   const [name, setName] = useState('');
 
   const [workerProfiles, setWorkerProfiles] = useState<WorkerProfile[]>([]); // State untuk menyimpan data worker
+  const [progressFiles, setProgressFiles] = useState<{ [key: string]: any[] }>({});
+
 
   useEffect(() => {
     const fetchQueueNumber = async () => {
@@ -812,6 +814,30 @@ export default function UserDashboard() {
 
     fetchQueueNumber();
   }, [name]);
+
+  useEffect(() => {
+  const fetchProgressFiles = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, "jawabanWorker"));
+      const tempFiles: { [key: string]: any[] } = {};
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const taskId = data.taskId;
+
+        if (!tempFiles[taskId]) tempFiles[taskId] = [];
+        tempFiles[taskId].push(data);
+      });
+
+      setProgressFiles(tempFiles);
+    } catch (err) {
+      console.error("❌ Error fetching progress files:", err);
+    }
+  };
+
+  fetchProgressFiles();
+}, []);
+
 
   // Fetch worker profiles from Firestore
   useEffect(() => {
@@ -1431,6 +1457,8 @@ const handleClickNotif = async (notifId: string) => {
     {userNotifications.map((n) => {
       const isCompleted = n.progress >= 100 && n.statusProgress === 'Task Completed';
       if (isCompleted) return null;
+      const files = progressFiles[n.id] || [];
+
 
       return (
         <div
@@ -1452,6 +1480,33 @@ const handleClickNotif = async (notifId: string) => {
               </div>
             </div>
           )}
+          {/* 📂 File progress */}
+        {files.length > 0 && (
+          <div className="mt-4 bg-gray-50 p-3 rounded border">
+            <p className="text-sm font-semibold mb-2">📥 File Progress oleh Worker:</p>
+            <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+              {files.map((f, i) => (
+                <li key={i}>
+                  <a
+                    href={f.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    {f.fileName}
+                  </a>{" "}
+                  {/* <span className="text-gray-400 text-xs">({new Date(f.uploadedAt.seconds * 1000).toLocaleString()})</span> */}
+                  <span className="text-gray-400 text-xs">
+  ({new Date(
+    f.uploadedAt?.seconds ? f.uploadedAt.seconds * 1000 : f.uploadedAt
+  ).toLocaleString()})
+</span>
+
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         </div>
       );
     })}
