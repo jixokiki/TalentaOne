@@ -1793,7 +1793,7 @@ const handleViewTask = async (task: Task) => {
         <p><strong>Deskripsi:</strong> {selectedTask.description}</p>
         <p><strong>Deadline:</strong> {new Date(selectedTask.deadline).toLocaleString()}</p>
         <p><strong>Status:</strong> {selectedTask.status}</p>
-        <p><strong>Nominal:</strong> {selectedTask.nominal}</p>
+        <p><strong>Nominal:</strong> {selectedTask.nominal !== undefined && selectedTask.nominal !== null ? String(selectedTask.nominal) : ""}</p>
       </div>
       <div className="mt-6 flex space-x-4">
         {selectedTask.status === "pending" && (

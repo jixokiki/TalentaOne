@@ -68,6 +68,7 @@ export interface Service {
   // }
 
   export interface Profile {
+    achievement: any;
     noRekening: string;
     role: string;
     specialRole: string;

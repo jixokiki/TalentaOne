@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect, ReactNode, useRef } from 'react';
@@ -273,6 +274,7 @@ useEffect(() => {
 useEffect(() => {
   const unpaidTask = userNotifications.find(
     (n) =>
+      typeof n.progress === "number" &&
       n.progress >= 100 &&
       n.statusProgress === "Task Completed" &&
       n.statusPembayaran !== "success"
@@ -286,20 +288,20 @@ useEffect(() => {
     setShowPaymentPopup(false);
   }
 }, [userNotifications]);
-const fetchUserNotifications = async () => {
-  const user = auth.currentUser;
-  if (!user) return;
+// const fetchUserNotifications = async () => {
+//   const user = auth.currentUser;
+//   if (!user) return;
 
-  const q = query(
-    collection(db, 'tugasdariuser'),
-    where('userId', '==', user.uid),
-    orderBy('createdAt', 'desc')
-  );
+//   const q = query(
+//     collection(db, 'tugasdariuser'),
+//     where('userId', '==', user.uid),
+//     orderBy('createdAt', 'desc')
+//   );
 
-  const snapshot = await getDocs(q);
-  const notifs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  setUserNotifications(notifs);
-};
+//   const snapshot = await getDocs(q);
+//   const notifs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+//   setUserNotifications(notifs);
+// };
 // useEffect(() => {
 //   if (paymentSuccess) {
 //     toast.success("🎉 Pembayaran berhasil disimpan!");
@@ -447,7 +449,7 @@ const handlePayment = async (taskId, nominal, amountToWorker) => {
     });
 
     const { snapUrl } = await snapRes.json();
-    const paymentWindow = window.open(snapUrl, "_blank");
+    // const paymentWindow = window.open(snapUrl, "_blank");
 
     // Step 3: Polling status pembayaran
     let retryCount = 0;
