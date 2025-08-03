@@ -114,7 +114,7 @@ export default function NavbarWorker() {
           >
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               <a
-                href="#"
+                href="/dashboard-worker"
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
               >
                 Home
@@ -126,7 +126,7 @@ export default function NavbarWorker() {
                 About
               </a>
               <a
-                href="#"
+                href="/dashboard-worker/services"
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
               >
                 Services

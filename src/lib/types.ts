@@ -12,6 +12,7 @@ export interface Task {
   fileUrl?: string;
   fileName?: string;
   progressPercentage?: number;
+   fileTugasAkhir?: string; // ✅ optional
 }
 
 

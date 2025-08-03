@@ -762,6 +762,7 @@ import { doc, setDoc, getDoc,addDoc, getDocs , collection, query, where, onSnaps
 import { storage, db, auth } from '@/lib/firebaseConfig';
 import NavbarWorker from '@/app/navbarworker'; // Sesuaikan path sesuai struktur proyek Anda
 import { Task, Profile} from "@/lib/types";
+import { FaStar } from "react-icons/fa";
 
 
 
@@ -1610,6 +1611,22 @@ const handleViewTask = async (task: Task) => {
   }
 };
 
+const [userRating, setUserRating] = useState<number | null>(null);
+// const currentUser = auth.currentUser;
+
+useEffect(() => {
+  const fetchRating = async () => {
+    if (!currentUser) return;
+
+    const ratingDoc = await getDoc(doc(db, "ratings", currentUser.uid));
+    if (ratingDoc.exists()) {
+      setUserRating(ratingDoc.data().rating);
+    }
+  };
+
+  fetchRating();
+}, [currentUser]);
+
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -1734,6 +1751,18 @@ const handleViewTask = async (task: Task) => {
                 >
                   Edit Profile
                 </button>
+                {userRating !== null && (
+  <div className="flex mt-2 space-x-1 text-yellow-400">
+    {[1, 2, 3, 4, 5].map((star) => (
+      <FaStar
+        key={star}
+        className={`${userRating >= star ? 'text-yellow-400' : 'text-gray-300'}`}
+      />
+    ))}
+    <span className="ml-2 text-xs text-gray-600">Rating dari client</span>
+  </div>
+)}
+
               </div>
 
               {/* Bagian Kanan: Informasi Profile */}

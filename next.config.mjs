@@ -12,6 +12,9 @@
 const nextConfig = {
     reactStrictMode: true,
     // Hapus output: 'export'
+    experimental: {
+    appDir: true,
+  },
   };
   
   export default nextConfig;

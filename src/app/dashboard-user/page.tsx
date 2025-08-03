@@ -14,6 +14,11 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { useRouter } from "next/navigation";
 
+import { FaStar } from "react-icons/fa";
+
+
+
+
 interface Message {
   type: string;
   profilePictureUrl: string | undefined;
@@ -74,6 +79,18 @@ export default function UserDashboard() {
 
     fetchQueueNumber();
   }, [name]);
+
+  // Tambahkan ini di dalam komponen utama
+const [selectedRatings, setSelectedRatings] = useState<{ [key: string]: number }>({});
+
+const handleRating = async (workerId: string, rating: number) => {
+  setSelectedRatings((prev) => ({ ...prev, [workerId]: rating }));
+
+  await setDoc(doc(db, "ratings", workerId), {
+    uid: workerId,
+    rating,
+  });
+};
 
   useEffect(() => {
   const fetchProgressFiles = async () => {
@@ -449,39 +466,79 @@ const handlePayment = async (taskId, nominal, amountToWorker) => {
     });
 
     const { snapUrl } = await snapRes.json();
-    // const paymentWindow = window.open(snapUrl, "_blank");
+    const paymentWindow = window.open(snapUrl, "_blank");
 
     // Step 3: Polling status pembayaran
-    let retryCount = 0;
-    const interval = setInterval(async () => {
-      const statusDoc = await getDoc(doc(db, "payments", orderId));
-      const paymentData = statusDoc.data();
+    // let retryCount = 0;
+    // const interval = setInterval(async () => {
+    //   const statusDoc = await getDoc(doc(db, "payments", orderId));
+    //   const paymentData = statusDoc.data();
 
-      if (paymentData?.status === "success") {
-        clearInterval(interval);
+    //   if (paymentData?.status === "success") {
+    //     clearInterval(interval);
 
-        // Update statusPembayaran di tugas
-        await updateDoc(doc(db, "tugasdariuser", taskId), {
-          statusPembayaran: "success",
-        });
+    //     // Update statusPembayaran di tugas
+    //     await updateDoc(doc(db, "tugasdariuser", taskId), {
+    //       statusPembayaran: "success",
+    //     });
 
-        // Update state lokal agar popup tidak muncul lagi
-        setUserNotifications((prev) =>
-          prev.map((n) =>
-            n.id === taskId ? { ...n, statusPembayaran: "success" } : n
-          )
-        );
+    //     // Update state lokal agar popup tidak muncul lagi
+    //     setUserNotifications((prev) =>
+    //       prev.map((n) =>
+    //         n.id === taskId ? { ...n, statusPembayaran: "success" } : n
+    //       )
+    //     );
 
-        setShowPaymentPopup(false);
-        setSelectedPaymentTask(null);
-        setPaymentSuccess(true);
-      }
+    //     setShowPaymentPopup(false);
+    //     setSelectedPaymentTask(null);
+    //     setPaymentSuccess(true);
+    //   }
 
-      retryCount++;
-      if (retryCount > 10) { // Stop polling setelah 10x (30 detik)
-        clearInterval(interval);
-      }
-    }, 3000);
+    //   retryCount++;
+    //   if (retryCount > 10) { // Stop polling setelah 10x (30 detik)
+    //     clearInterval(interval);
+    //   }
+    // }, 3000);
+
+    // Step 3: Polling status pembayaran via Midtrans
+let retryCount = 0;
+const interval = setInterval(async () => {
+  const statusRes = await fetch("/api/midtrans-status", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ orderId }),
+  });
+
+  const { status } = await statusRes.json();
+
+  if (status === "settlement" || status === "capture") {
+    clearInterval(interval);
+
+    // Simpan status sukses ke Firestore
+    await updateDoc(doc(db, "payments", orderId), {
+      status: "success",
+    });
+
+    // Update status pembayaran di tugas
+    await updateDoc(doc(db, "tugasdariuser", taskId), {
+      statusPembayaran: "success",
+    });
+
+    // Update UI
+    setUserNotifications((prev) =>
+      prev.map((n) =>
+        n.id === taskId ? { ...n, statusPembayaran: "success" } : n
+      )
+    );
+    setShowPaymentPopup(false);
+    setSelectedPaymentTask(null);
+    setPaymentSuccess(true);
+  }
+
+  retryCount++;
+  if (retryCount > 10) clearInterval(interval); // Stop polling setelah 30 detik
+}, 3000);
+
   } catch (error) {
     console.error("Gagal memproses pembayaran:", error);
     alert("Terjadi kesalahan saat memproses pembayaran.");
@@ -660,7 +717,7 @@ const handleClickNotif = async (notifId: string) => {
   </div>
 )}
 
-<h1 className="text-xl font-bold">Daftar Tugas</h1>
+{/* <h1 className="text-xl font-bold">Daftar Tugas</h1>
       <ul className="mt-4">
         {tasks.map((task) => (
           <li key={task.id} className="mb-4 border p-4 rounded">
@@ -675,7 +732,23 @@ const handleClickNotif = async (notifId: string) => {
             </button>
           </li>
         ))}
-      </ul>
+      </ul> */}
+      <h1 className="text-xl font-bold">Daftar Tugas</h1>
+<ul className="mt-4">
+  {userNotifications.map((task) => (
+    <li key={task.id} className="mb-4 border p-4 rounded">
+      <p className="font-medium">{task.namaTugas || task.description}</p>
+      <p>Status Pembayaran: {task.statusPembayaran || "belum bayar"}</p>
+      <button
+        className="mt-2 px-4 py-1 bg-blue-600 text-white rounded"
+        onClick={() => handleSelectTaskForPayment(task)}
+        disabled={task.statusPembayaran === "success"}
+      >
+        {task.statusPembayaran === "success" ? "Sudah Dibayar" : "Bayar Sekarang"}
+      </button>
+    </li>
+  ))}
+</ul>
 
 {userNotifications.some((n) => !n.isRead) && (
   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -892,6 +965,19 @@ const handleClickNotif = async (notifId: string) => {
                 <p className="text-gray-700"><span className="font-semibold">Special Role:</span> {worker.specialRole}</p>
               </div>
 
+              {/* Komponen Rating Bintang */}
+<div className="mt-3 flex items-center space-x-1 text-yellow-400">
+  {[1, 2, 3, 4, 5].map((star) => (
+    <FaStar
+      key={star}
+      onClick={() => handleRating(worker.uid, star)}
+      className={`cursor-pointer ${
+        selectedRatings[worker.uid] >= star ? 'text-yellow-400' : 'text-gray-300'
+      }`}
+    />
+  ))}
+</div>
+
               {/* Link Portofolio */}
               <div className="mt-3">
                 <a
@@ -913,6 +999,7 @@ const handleClickNotif = async (notifId: string) => {
               </button>
             </div>
           ))}
+
         </div>
       ) : (
         <p className="text-gray-600 text-xs">Belum ada data worker.</p>
