@@ -305,28 +305,7 @@ useEffect(() => {
     setShowPaymentPopup(false);
   }
 }, [userNotifications]);
-// const fetchUserNotifications = async () => {
-//   const user = auth.currentUser;
-//   if (!user) return;
 
-//   const q = query(
-//     collection(db, 'tugasdariuser'),
-//     where('userId', '==', user.uid),
-//     orderBy('createdAt', 'desc')
-//   );
-
-//   const snapshot = await getDocs(q);
-//   const notifs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-//   setUserNotifications(notifs);
-// };
-// useEffect(() => {
-//   if (paymentSuccess) {
-//     toast.success("🎉 Pembayaran berhasil disimpan!");
-//     getTugas(); // tetap boleh dipanggil jika kamu pakai di bagian lain
-//     fetchUserNotifications(); // refresh userNotifications
-//     setPaymentSuccess(false);
-//   }
-// }, [paymentSuccess]);
 
 useEffect(() => {
   if (paymentSuccess) {
@@ -334,113 +313,6 @@ useEffect(() => {
     setPaymentSuccess(false);
   }
 }, [paymentSuccess]);
-
-
-
-
-  // const handlePayment = async (taskId, nominal, amountToWorker) => {
-  //   try {
-  //     const orderId = `${taskId}-${Date.now()}`;
-
-  //     // Step 1: Simpan transaksi ke Firestore
-  //     await setDoc(doc(db, "payments", orderId), {
-  //       taskId,
-  //       orderId,
-  //       nominal,
-  //       fee: nominal * 0.1,
-  //       totalReceived: amountToWorker,
-  //       status: "pending",
-  //       createdAt: new Date(),
-  //     });
-
-  //     // Step 2: Ambil Snap URL dari backend
-  //     const snapRes = await fetch("/api/midtrans", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ order_id: orderId, gross_amount: nominal }),
-  //     });
-
-  //     const { snapUrl } = await snapRes.json();
-  //     const paymentWindow = window.open(snapUrl, "_blank");
-
-  //     // Step 3: Polling status pembayaran
-  //     const interval = setInterval(async () => {
-  //       const statusDoc = await getDoc(doc(db, "payments", orderId));
-  //       const paymentData = statusDoc.data();
-
-  //       if (paymentData?.status === "success") {
-  //         clearInterval(interval);
-
-  //         // ✅ Update statusPembayaran di tugas
-  //         await updateDoc(doc(db, "tugasdariuser", taskId), {
-  //           statusPembayaran: "success",
-  //         });
-
-  //         // ✅ Update UI
-  //         setShowPaymentPopup(false);
-  //         setSelectedPaymentTask(null);
-  //         setPaymentSuccess(true);
-  //       }
-  //     }, 3000);
-  //   } catch (error) {
-  //     console.error("Gagal memproses pembayaran:", error);
-  //     alert("Terjadi kesalahan saat memproses pembayaran.");
-  //   }
-  // };
-
-
-//   const handlePayment = async (taskId, nominal, amountToWorker) => {
-//   try {
-//     const orderId = `${taskId}-${Date.now()}`;
-
-//     await setDoc(doc(db, "payments", orderId), {
-//       taskId,
-//       orderId,
-//       nominal,
-//       fee: nominal * 0.1,
-//       totalReceived: amountToWorker,
-//       status: "pending",
-//       createdAt: new Date(),
-//     });
-
-//     const snapRes = await fetch("/api/midtrans", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ order_id: orderId, gross_amount: nominal }),
-//     });
-
-//     const { snapUrl } = await snapRes.json();
-//     const paymentWindow = window.open(snapUrl, "_blank");
-
-//     const interval = setInterval(async () => {
-//       const statusDoc = await getDoc(doc(db, "payments", orderId));
-//       const paymentData = statusDoc.data();
-
-//       if (paymentData?.status === "success") {
-//         clearInterval(interval);
-
-//         await updateDoc(doc(db, "tugasdariuser", taskId), {
-//           statusPembayaran: "success",
-//         });
-
-//         // ✅ Update state lokal
-//         setUserNotifications((prev) =>
-//           prev.map((n) =>
-//             n.id === taskId ? { ...n, statusPembayaran: "success" } : n
-//           )
-//         );
-
-//         setShowPaymentPopup(false);
-//         setSelectedPaymentTask(null);
-//         setPaymentSuccess(true);
-//       }
-//     }, 3000);
-//   } catch (error) {
-//     console.error("Gagal memproses pembayaran:", error);
-//     alert("Terjadi kesalahan saat memproses pembayaran.");
-//   }
-// };
-
 
 
 const handlePayment = async (taskId, nominal, amountToWorker) => {
@@ -467,38 +339,6 @@ const handlePayment = async (taskId, nominal, amountToWorker) => {
 
     const { snapUrl } = await snapRes.json();
     const paymentWindow = window.open(snapUrl, "_blank");
-
-    // Step 3: Polling status pembayaran
-    // let retryCount = 0;
-    // const interval = setInterval(async () => {
-    //   const statusDoc = await getDoc(doc(db, "payments", orderId));
-    //   const paymentData = statusDoc.data();
-
-    //   if (paymentData?.status === "success") {
-    //     clearInterval(interval);
-
-    //     // Update statusPembayaran di tugas
-    //     await updateDoc(doc(db, "tugasdariuser", taskId), {
-    //       statusPembayaran: "success",
-    //     });
-
-    //     // Update state lokal agar popup tidak muncul lagi
-    //     setUserNotifications((prev) =>
-    //       prev.map((n) =>
-    //         n.id === taskId ? { ...n, statusPembayaran: "success" } : n
-    //       )
-    //     );
-
-    //     setShowPaymentPopup(false);
-    //     setSelectedPaymentTask(null);
-    //     setPaymentSuccess(true);
-    //   }
-
-    //   retryCount++;
-    //   if (retryCount > 10) { // Stop polling setelah 10x (30 detik)
-    //     clearInterval(interval);
-    //   }
-    // }, 3000);
 
     // Step 3: Polling status pembayaran via Midtrans
 let retryCount = 0;
@@ -545,16 +385,6 @@ const interval = setInterval(async () => {
   }
 };
 
-  // const handleSelectTaskForPayment = (task) => {
-  //   if (task.statusPembayaran === "success") {
-  //     setShowPaymentPopup(false);
-  //     return;
-  //   }
-  //   setSelectedPaymentTask(task);
-  //   setShowPaymentPopup(true);
-  // };
-
-
   const handleSelectTaskForPayment = (task) => {
   if (task.statusPembayaran === "success") {
     setShowPaymentPopup(false);
@@ -563,10 +393,6 @@ const interval = setInterval(async () => {
   setSelectedPaymentTask(task);
   setShowPaymentPopup(true);
 };
-
-
-// const progressRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-// const [userNotifications, setUserNotifications] = useState<any[]>([]);
 
 // 2. Fetch Data Notifikasi
 useEffect(() => {
@@ -698,11 +524,7 @@ const handleClickNotif = async (notifId: string) => {
       <ToastContainer />
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-4xl font-extrabold text-gray-800">Dashboard User</h1>
-        {/* <FiUser
-          className="text-4xl text-gray-800 cursor-pointer"
-          onClick={handleProfileClick}
-          title="Profile"
-        /> */}
+
       </div>
       <p className="mb-8 text-lg">Selamat datang, User!</p>
       {paymentSuccess && (
@@ -717,22 +539,7 @@ const handleClickNotif = async (notifId: string) => {
   </div>
 )}
 
-{/* <h1 className="text-xl font-bold">Daftar Tugas</h1>
-      <ul className="mt-4">
-        {tasks.map((task) => (
-          <li key={task.id} className="mb-4 border p-4 rounded">
-            <p className="font-medium">{task.namaTugas}</p>
-            <p>Status Pembayaran: {task.statusPembayaran || "belum bayar"}</p>
-            <button
-              className="mt-2 px-4 py-1 bg-blue-600 text-white rounded"
-              onClick={() => handleSelectTaskForPayment(task)}
-              disabled={task.statusPembayaran === "success"}
-            >
-              {task.statusPembayaran === "success" ? "Sudah Dibayar" : "Bayar Sekarang"}
-            </button>
-          </li>
-        ))}
-      </ul> */}
+
       <h1 className="text-xl font-bold">Daftar Tugas</h1>
 <ul className="mt-4">
   {userNotifications.map((task) => (
@@ -815,58 +622,6 @@ const handleClickNotif = async (notifId: string) => {
       );
     })}
   </div>
-
-{/**jangan dihapus */}
-{/* {showPaymentPopup && selectedPaymentTask && selectedPaymentTask.statusPembayaran !== "success" &&  (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-    <div className="relative bg-white p-6 rounded shadow-lg w-full max-w-md">
-      
-      Tombol X / Close
-      <button
-        onClick={() => setShowPaymentPopup(false)}
-        className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-lg font-bold"
-        aria-label="Tutup"
-      >
-        &times;
-      </button>
-
-      <h2 className="text-xl font-semibold mb-4">Pembayaran Tugas</h2>
-      <p className="mb-2">Tugas: {selectedPaymentTask.description}</p>
-      <p className="mb-2">Deadline: {new Date(selectedPaymentTask.deadline).toLocaleString()}</p>
-      <p className="mb-2">Progress: {selectedPaymentTask.progress.toFixed(2)}%</p>
-      <p className="mb-2">
-  Progress:{" "}
-  {typeof selectedPaymentTask?.progress === "number"
-    ? `${selectedPaymentTask.progress.toFixed(2)}%`
-    : "Belum ada progress"}
-</p>
-
-
-      {(() => {
-        const nominal = selectedPaymentTask.nominal || 0;
-        const fee = nominal * 0.1;
-        const totalDiterima = nominal - fee;
-
-        return (
-          <>
-            <p className="mb-2">Total Pembayaran: Rp {nominal.toLocaleString()}</p>
-            <p className="mb-2 text-sm text-gray-600">Fee Admin (10%): Rp {fee.toLocaleString()}</p>
-            <p className="mb-4 font-bold text-green-600">
-              Total Diterima Worker: Rp {totalDiterima.toLocaleString()}
-            </p>
-            <button
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-              onClick={() => handlePayment(selectedPaymentTask.id, nominal, totalDiterima)}
-            >
-              Bayar Sekarang (Midtrans)
-            </button>
-          </>
-        );
-      })()}
-    </div>
-  </div>
-)} */}
-
 
 {showPaymentPopup && selectedPaymentTask && selectedPaymentTask.statusPembayaran !== "success" && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
