@@ -957,19 +957,42 @@ interface Service {
   description: string;
 }
 
-// ========== Helpers UI ==========
-const Skeleton = ({ className = '' }: { className?: string }) => (
-  <div className={`animate-pulse rounded-xl bg-white/40 dark:bg-white/10 backdrop-blur-sm ${className}`} />
-);
+/* =========================
+   Helpers: NO any typings
+   ========================= */
 
-function formatDateTime(input: any) {
-  try {
-    const d = new Date(input);
-    if (isNaN(d.getTime())) return '-';
-    return d.toLocaleString();
-  } catch {
-    return '-';
+// Firestore Timestamp-like (tanpa impor tipe Firestore)
+type FirestoreTimestampLike = {
+  seconds: number;
+  nanoseconds: number;
+  toDate?: () => Date;
+};
+
+type DateInput = string | number | Date | FirestoreTimestampLike | null | undefined;
+
+function toDateSafe(value: DateInput): Date | null {
+  if (value == null) return null;
+
+  // Firestore Timestamp-like
+  if (typeof value === 'object' && 'seconds' in value) {
+    const ts = value as FirestoreTimestampLike;
+    if (typeof ts.toDate === 'function') return ts.toDate();
+    return new Date(ts.seconds * 1000);
   }
+
+  if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+
+  if (typeof value === 'number' || typeof value === 'string') {
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  return null;
+}
+
+function formatDateTime(input: DateInput) {
+  const d = toDateSafe(input);
+  return d ? d.toLocaleString() : '-';
 }
 
 const statusStyles: Record<
@@ -998,6 +1021,10 @@ const statusStyles: Record<
     label: 'Ditolak',
   },
 };
+
+const Skeleton = ({ className = '' }: { className?: string }) => (
+  <div className={`animate-pulse rounded-xl bg-white/40 dark:bg-white/10 backdrop-blur-sm ${className}`} />
+);
 
 export default function Services() {
   const [services, setServices] = useState<Service[]>([]);
@@ -1033,34 +1060,31 @@ export default function Services() {
     const taskSnap = await getDoc(taskRef);
 
     if (taskSnap.exists()) {
-      const data = taskSnap.data() as any;
-      setProgressPercentage(data.progress || 0);
-      setSelectedTask({ ...task, fileTugasAkhir: (data as any).fileTugasAkhir });
+      const data = taskSnap.data() as Partial<Task> & { progress?: number; fileTugasAkhir?: string };
+      setProgressPercentage(typeof data.progress === 'number' ? data.progress : 0);
+      setSelectedTask({ ...task, fileTugasAkhir: data.fileTugasAkhir });
     }
   };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (!user) {
-        console.log('Belum login. Tidak bisa ambil tugas.');
+        // Belum login. Tidak bisa ambil tugas.
         setLoadingTasks(false);
         return;
       }
 
-      console.log('User login dengan email:', user.email);
-
       const unsubSnapshot = onSnapshot(collection(db, 'tugasdariuser'), (snapshot) => {
-        const tasks: Task[] = snapshot.docs.map((docSnap) => ({
+        const tasks = snapshot.docs.map((docSnap) => ({
           id: docSnap.id,
           ...docSnap.data(),
         })) as Task[];
 
-        console.log('📦 Tugas ditemukan:', tasks);
         setNotifications(tasks);
         setLoadingTasks(false);
       });
 
-      // Catatan: mengikuti struktur aslinya—cleanup snapshot ada di dalam callback
+      // mengikuti struktur aslinya—cleanup snapshot ada di dalam callback
       return () => unsubSnapshot();
     });
 
@@ -1236,7 +1260,7 @@ export default function Services() {
                             <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-600 dark:text-slate-300/80">
                               <span className="inline-flex items-center gap-1">
                                 <FiClock />
-                                {formatDateTime((task as any).deadline)}
+                                {formatDateTime(task.deadline as DateInput)}
                               </span>
                             </div>
                           </div>
@@ -1277,7 +1301,7 @@ export default function Services() {
 
                   {selectedTask?.fileTugasAkhir && (
                     <a
-                      href={selectedTask.fileTugasAkhir as any}
+                      href={selectedTask.fileTugasAkhir}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:scale-[1.02] hover:shadow-indigo-600/30 active:scale-[0.99]"
