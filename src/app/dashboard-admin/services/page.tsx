@@ -7,7 +7,6 @@ import {
   collection,
   onSnapshot,
   query,
-  where,
   orderBy,
   DocumentData,
 } from 'firebase/firestore';
@@ -19,7 +18,7 @@ type QueueItem = {
   id: string;
   name: string;
   queueNumber: string | number;
-  createdAt?: any; // Firestore Timestamp or Date
+  createdAt?: any; // Firestore Timestamp atau Date
 };
 
 type Tugas = {
@@ -119,6 +118,7 @@ export default function AdminInteractionMonitor() {
   const [payments, setPayments] = useState<Payment[]>([]);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const unsubAuth = onAuthStateChanged(auth, (user) => {
       // kamu bisa tambahkan guard “role admin” di sini kalau perlu
       setReady(true);
