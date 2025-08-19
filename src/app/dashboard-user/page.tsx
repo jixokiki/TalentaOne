@@ -1129,6 +1129,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Task, WorkerProfile } from '@/lib/types';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Footer from '@/components/Footer'; // ⬅️ tambahkan ini (sesuaikan path)
 
 import { useRouter } from 'next/navigation';
 
@@ -1639,24 +1640,26 @@ export default function UserDashboard() {
   };
 
   return (
-    <main
-      role="main"
-      className="min-h-svh relative overflow-x-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
-    >
+    // <main
+    //   role="main"
+    //   className="min-h-svh relative overflow-x-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+    // >
+    <div className="min-h-svh flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <main role="main" className="relative flex-1 overflow-x-hidden">
       {/* Decorative premium layers */}
       <div className="pointer-events-none absolute inset-0 opacity-30">
         <div className="absolute -top-1/3 -left-1/3 h-[80vmax] w-[80vmax] rounded-full bg-gradient-to-tr from-blue-500 via-cyan-400 to-indigo-500 blur-3xl" />
         <div className="absolute -bottom-1/3 -right-1/3 h-[70vmax] w-[70vmax] rounded-full bg-gradient-to-tr from-violet-500 via-fuchsia-400 to-amber-300 blur-3xl" />
       </div>
 
-      <div className="relative">
+      <div className="relative flex-1 overflow-x-hidden">
         <NavbarUser />
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-2">
           <div className="mb-4">
             <Breadcrumbs
               items={[
-                { name: 'Home', href: '/' },
+                { name: 'Halaman Utama', href: '/' },
                 { name: 'Dashboard User', href: '/dashboard-user' },
               ]}
             />
@@ -2316,5 +2319,7 @@ export default function UserDashboard() {
         </div>
       </div>
     </main>
+    <Footer/>
+   </div>
   );
 }

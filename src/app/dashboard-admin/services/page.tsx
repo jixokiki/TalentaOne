@@ -255,9 +255,9 @@ export default function AdminInteractionMonitor() {
       <div className="mx-auto max-w-7xl p-6">
         <NavbarAdmin />
         <Breadcrumbs items={[
-  { name: 'Home', href: '/' },
+  { name: 'Halaman Utama', href: '/' },
   { name: 'Dashboard Admin', href: '/dashboard-admin' },
-  { name: 'Interaction Monitor', href: '/dashboard-admin' }, // jika ada sub-route, ganti href-nya
+  { name: 'Interaction Monitor', href: '/dashboard-admin/services' }, // jika ada sub-route, ganti href-nya
 ]} />
 
         {/* Header */}

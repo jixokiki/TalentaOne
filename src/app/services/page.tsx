@@ -938,7 +938,6 @@ import {
   // where
 } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebaseConfig';
-import Navbar from '@/app/navbar';
 import { Task } from '@/lib/types';
 import { motion } from 'framer-motion';
 import {
@@ -950,6 +949,7 @@ import {
   FiAlertCircle,
   FiDownload,
 } from 'react-icons/fi';
+import NavbarUser from '../navbaruser';
 
 interface Service {
   id: string;
@@ -1101,7 +1101,7 @@ export default function Services() {
         <div className="absolute left-1/2 top-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-sky-300/20 blur-3xl dark:bg-sky-500/20" />
       </div>
 
-      <Navbar />
+      <NavbarUser />
 
       <main className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-24 pt-32">
         {/* Header / Hero */}

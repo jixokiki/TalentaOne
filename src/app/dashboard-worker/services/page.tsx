@@ -285,7 +285,7 @@ export default function WorkerServicesPage() {
       <div className="mx-auto w-full max-w-7xl px-6 pt-6">
         <Breadcrumbs
           items={[
-            { name: 'Home', href: '/' },
+            { name: 'Halaman Utama', href: '/' },
             { name: 'Dashboard Worker', href: '/dashboard-worker' },
             // Kalau halaman ini berada di sub-route (mis. /dashboard-worker/services), aktifkan baris di bawah:
             // { name: 'Layanan Sukses Dibayar', href: '/dashboard-worker/services' },

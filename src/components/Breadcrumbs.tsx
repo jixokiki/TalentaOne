@@ -67,11 +67,11 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
           return (
             <li key={`${it.href}-${i}`} className="flex items-center gap-2">
               {isLast ? (
-                <span className="text-gray-900 font-semibold" aria-current="page">
+                <span className="text-black font-semibold" aria-current="page">
                   {it.name}
                 </span>
               ) : (
-                <Link href={it.href} className="text-gray-600 hover:text-gray-900">
+                <Link href={it.href} className="text-gray-400 hover:text-black">
                   {it.name}
                 </Link>
               )}

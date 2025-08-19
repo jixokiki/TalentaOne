@@ -1232,7 +1232,7 @@ export default function WorkerDashboard() {
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-6">
         <Breadcrumbs
           items={[
-            { name: 'Home', href: '/' },
+            { name: 'Halaman Utama', href: '/' },
             { name: 'Dashboard Worker', href: '/dashboard-worker' },
           ]}
         />
