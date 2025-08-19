@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { db, auth } from '@/lib/firebaseConfig';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import {
   collection,
   onSnapshot,
@@ -253,6 +254,11 @@ export default function AdminInteractionMonitor() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
       <div className="mx-auto max-w-7xl p-6">
         <NavbarAdmin />
+        <Breadcrumbs items={[
+  { name: 'Home', href: '/' },
+  { name: 'Dashboard Admin', href: '/dashboard-admin' },
+  { name: 'Interaction Monitor', href: '/dashboard-admin' }, // jika ada sub-route, ganti href-nya
+]} />
 
         {/* Header */}
         <div className="mt-6 rounded-3xl bg-white/60 backdrop-blur border border-gray-200 p-6 shadow-sm">
