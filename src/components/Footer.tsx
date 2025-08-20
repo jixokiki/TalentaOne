@@ -33,23 +33,35 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative mt-24 text-gray-900 dark:text-gray-100">
+    // <footer className="relative mt-24 text-gray-900 dark:text-gray-100">
+    <footer className="relative isolate overflow-x-hidden mt-24 text-gray-900 dark:text-gray-100">
       {/* Luxe ambient background glows */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-teal-400/25 blur-3xl" />
+      {/* <div className="pointer-events-none absolute inset-0 -z-10"> */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        {/* <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-teal-400/25 blur-3xl" /> */}
+        <div className="absolute top-0 left-0 h-80 w-80 -translate-x-1/3 -translate-y-1/3 rounded-full bg-teal-400/25 blur-3xl" />
         <div className="absolute top-1/3 -right-24 h-72 w-72 rounded-full bg-cyan-400/25 blur-3xl" />
         <div className="absolute -bottom-24 left-1/3 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-600/25 blur-3xl" />
       </div>
 
       {/* Top CTA band */}
       <section className="relative mx-auto max-w-7xl px-4 sm:px-6">
-        <motion.div
+        {/* <motion.div
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.4 }}
           className="relative -mb-14 rounded-3xl border border-white/30 bg-white/70 p-6 pb-8 shadow-[0_30px_80px_-28px_rgba(0,0,0,0.35)] backdrop-blur-2xl dark:bg-neutral-900/60"
-        >
+        > */}
+        <motion.div
+  variants={fadeUp}
+  initial="hidden"
+  whileInView="show"
+  viewport={{ once: true, amount: 0.4 }}
+  className="relative rounded-3xl border ... pb-14"
+  style={{ transform: 'translateY(0)' }} // optional
+>
+
           <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-white/70 to-transparent" />
           <div className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
 

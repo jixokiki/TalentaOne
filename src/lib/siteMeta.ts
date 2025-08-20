@@ -10,8 +10,8 @@
 //   ],
 // };
 export const SITE = {
-  name: 'Skilllova', // ganti brand
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://domainkamu.com',
+  name: 'SkillNova', // ganti brand
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://talentaone.vercel.app/',
   description:
     'Platform layanan freelance dengan monitoring progres & pembayaran real-time.',
   logo: '/logo.png',   // pastikan ada di /public

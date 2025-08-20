@@ -22,7 +22,8 @@ import {
   FiAlertCircle,
   // ⛔️ FiDownload dihapus agar tidak ada opsi download
 } from 'react-icons/fi';
-import NavbarUser from '../navbaruser';
+
+import Navbar from '../navbar';
 
 interface Service {
   id: string;
@@ -174,7 +175,7 @@ export default function Services() {
         <div className="absolute left-1/2 top-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-sky-300/20 blur-3xl dark:bg-sky-500/20" />
       </div>
 
-      <NavbarUser />
+      <Navbar />
 
       <main className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-24 pt-32">
         {/* Header / Hero */}
